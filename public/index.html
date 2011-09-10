@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="/css/clientApp.css" type="text/css" charset="utf-8">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+  
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+
+$(document).ready(function(){
+var socket = io.connect('http://72.14.181.251');
+	$('#submit').click(function(){
+		
+		//var loginObject = {user: $('#user').val, password: $('password').val};
+		
+		socket.emit('validate', {user: $('#user').val(), password: $('#password').val()});
+		console.log($('#user').val());
+	});
+});
+
+
+
+</script>
+ 
+</head>
+  <body>
+	<div class="login" align="center">
+		<input id="user" type="text" name="username" size="15" /><br/>
+		<input id="password" type="password" name="passwort" size="15" /><br/>
+    		<input id="submit" type="submit" value="Login"/>
+	</div>
+
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<script>
+
+
+$(document).ready(function(){
+
+	$('#submit').click(function(){
+		
+		//var loginObject = {user: $('#user').val, password: $('password').val};
+		
+		socket.emit('validate', {user: $('#user').val(), password: $('#password').val()});
+		console.log($('#user').val());
+	});
+});
+
+
+
+</script>
+
+	<div class="login" align="center">
+		<h1>Login</h1>
+		<input id="user" type="text" name="username" size="15" /><br/>
+		<input id="password" type="password" name="passwort" size="15" /><br/>
+    		<input id="submit" type="submit" value="Login"/>
+	</div>
