@@ -56,7 +56,7 @@ io.sockets.on('connection', function (socket) {
 function User (_socket){
 	
 	this.socket = _socket;
-	
+	this.userNaem;
 	var cards = new Array();
 
 	this.button;
@@ -68,6 +68,11 @@ function User (_socket){
 		users.pop(this);
 	});
 
+	this.socket.on("PlayerName", function(data){
+		manager.reportName(this, data.user);
+	});
+
+
 	this.sendMsg = function(title, data){
 		this.socket.emit(title, data);
 	 };
@@ -75,7 +80,7 @@ function User (_socket){
 	this.revCards = function(_cards){
 
 		cards = _cards;
-		this.sendMsg("cards", "card1:" +  cards[0] + ", card2:" + cards[1]);
+		this.sendMsg("cards", {"card1": cards[0], "card2": cards[1]});
 
 	}
 
@@ -110,6 +115,8 @@ function Manager (){
 			}			
 		};
 
+		
+		//chagne
 		var table = new Table;
 		table.addPlayer(player);		
 		tables.push(table);
@@ -118,6 +125,16 @@ function Manager (){
 
 
 		return tables.length;
+	};
+
+	this.reportName = function(player, name){
+
+		for (var i=0;i < tables.length;i++){
+
+			if(tables[i].findPlayer(player) == true){
+				tables[i].broadCast("opName", {"name": name});			
+			}
+		}
 	};
 
 	
@@ -133,7 +150,26 @@ function Table(){
 	
 	var comunCards = new Array();
 
+	var flop;
+	var turn;
+	var street4;
 	
+	//even or odd = palyer start bet: Need changed
+	var startPlayer = 0;
+	var playerBet;
+
+
+
+	this.findPlayer = function(User){
+	
+                for (var i=0;i < players.length;i++){
+			 if(players[i].socket.id == User.id){
+				return true;
+			 }
+		}
+
+	};
+
 	 this.removePlayer = function (User) {
 		
 		for (var i=0;i < players.length;i++){
@@ -143,7 +179,7 @@ function Table(){
 				players.pop(User);
 
 				
-				broadCast("tableStatus", "You are the Winner!");
+				this.broadCast("tableStatus", "You are the Winner!");
 
 				return true;
 
@@ -159,13 +195,13 @@ function Table(){
 
 		if (players.length > 1){
 			this.tableAvil = false;
-			broadCast("tableStatus", "Start Table!");
+			this.broadCast("tableStatus", "Start Table!");
 			console.log("Start Table");
 			dealCards();
 		}
 		else{
 			this.tableAvil = true;
-			broadCast("tableStatus", "Waiting on more players!");
+			this.broadCast("tableStatus", "Waiting on more players!");
 			console.log("Waiting on more players");
 			players[0].button = true;
 		}
@@ -187,16 +223,30 @@ function Table(){
 
 	};
 
+	this.game = function(User, action){
+
+		if(User.id == players[startPlayer].socket.id){
+			
+		}
+
+
+	};
+
+
 
 	var moveButton = function(){
 		if (players[0].button == true){
 			players[0].button = false;
 			players[1].button = true;
+		}else{
+
+		        players[1].button = false;
+                        players[0].button = true;
 		}		
-	}
+	};
 
 
-	var broadCast = function(title, data){
+	this.broadCast = function(title, data){
 		
 		for (var i=0;i < players.length;i++){		
 			players[i].sendMsg(title, data); 

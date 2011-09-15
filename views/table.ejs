@@ -9,15 +9,71 @@
 	$(document).ready(function(){
 
        		 var socket = io.connect('http://localhost');
-       		
+       		 var myName;
+		
+		$('#nameInput').fadeOut('fast',function(){});
+
+
+		$('#submit').click(function(){
+			socket.emit('PlayerName', {"user": $('#user').val()});		
+		
+			myName = $('#user').val();
+			$('#myName').append("<h2> " + $('#user').val() + "</h2>");
+			$('#nameInput').empty();
+			
+		});
+
+		socket.on('opName', function(data){
+			
+			if(data.name != myName){
+				$('#opName').append("<h2> " + data.name + "</h2>");				
+
+			}
+			console.log(data.name);
+		
+		});
+
+
+	
 		 socket.on('tableStatus', function(data){
-                	console.log(data);
+			
+			if(data == "You are the Winner!"){
+				$("#player1").fadeOut('slow', function(){});
+				$("#player2").delay(1200).fadeOut('slow', function(){});  
+			}
+
+                	$("#status").append("<p>" + data + "</p>").fadeIn('slow', function(){});
+			$("#status").delay(900).fadeOut('slow', function(){});	
 		 });
 
 		socket.on('cards', function(data){
-			console.log(data.card2);		
+				
+			var card1 = "/Images/DeckCards/" + data.card1.toString() + ".png"
+			var card2 = "/Images/DeckCards/" + data.card2.toString() + ".png"
+		
+			$("#player1").delay(1500).fadeIn('slow', function(){});
+			$("#player2").delay(1500).fadeIn('slow', function(){});
 
-		});	
+	
+			$("#player1").append("<img src='" + card1 + "' alt='card'/>");		
+			$("#player1").append("<img src='" + card2 + "' alt='card'/>");
+
+			$("#player2").append("<img src='/Images/DeckCards/b1fv.png' alt='card'/>");		
+			$("#player2").append("<img src='/Images/DeckCards/b1fv.png' alt='card'/></center>");
+
+			$('#nameInput').fadeIn('slow',function(){});
+
+		});
+
+		socket.on('action', function(data){
+			
+			$("playerMoves").append(data.ui);
+		});
+		
+
+		this.sendMsg = function(title, data){
+               			 socket.emit(title, data);
+       		};	
 
 	});
 	
@@ -27,8 +83,12 @@
 	<h1>Tables</h1>
 </div>
 
+
+
 <div id="Table">
-		
+
+	<div id="opName"></div>		
+
 	<div id="player2"></div>  
 	
 	<div id="status"></div>
@@ -36,8 +96,13 @@
 	<div id="player1"></div>		
 	
 	<div id="playerMoves"></div>
-		
 
+	 <div id="myName"></div>
+	
+	<div id="nameInput">
+        	<input id="user" type="text" name="username" size="15" />
+        	<input id="submit" type="submit" value="Submit"/>
+	</div>
 </div>
 
 <div id="PlayerControls" align="center">

@@ -4,23 +4,39 @@
 	   position: 50%;
 	   margin: auto;
 }
+<i<
+#table h2{margin: 0;
+   padding: 0;}
+
+#opName{float: left;
+	padding-left: 10px;}
+
+#opName h2{margin: 0;
+	  padding: 0;}
+
+#myName{float: left;
+	padding-left: 10px;}
+
+#myName h2{margin: 0;
+	  padding: 0;}
+
+
 #player2{background-color: red;
-		width: 200px;
-		height: 100px;
+		width: auto;
+		height: auto;
 		position: absolute;
 		margin-left:200px;
 		margin-top:75px;}
 		
-#status{background-color: purple;
-		width: 200px;
+#status{width: auto;
 		height: 40px;
 		position: absolute;
 		margin-top: 230px;
 		margin-left:200px;}
 
 #player1{background-color: yellow;
-		 width: 200px;
-		 height: 100px;
+		 width: auto;
+		 height: auto;
 		 position: absolute;
 		 margin-left:200px;
 		 margin-top: 325px;
