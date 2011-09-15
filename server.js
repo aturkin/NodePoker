@@ -1,4 +1,3 @@
-
 //require.paths.unshift(__dirname + '/../../lib/');
 
 var express = require('express')
@@ -15,24 +14,22 @@ var app = express.createServer();
 
 
 app.configure(function () {
-
-
+app.use(express.static(__dirname + '/public'));
 });
-
 
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, res) {
-  res.render('index', { layout: false });
+	res.render('index', { layout: true });
 });
 
-app.get('/hello', function (req, res) {
-	res.render("hello", {layout: false }); 
-})
+app.get('/table', function (req, res) {
+	res.render("table", {layout: false  }); 
+});
 
-app.listen(3000, function () {
+app.listen(3000, function (){ 
   var addr = app.address();
   
   //creat Manager
@@ -44,83 +41,192 @@ var login = null;
 var user;
 
 io.sockets.on('connection', function (socket) {
-	//var user = new User(socket)
+	
+	var user = new User(socket);
 	users.push(user);
 
-	manager.findTable().addUser(user);
-
-	//users[users.length] = user;
-
+	manager.addUser(user);
+	console.log("Tables Count " + manager.tablesCount);
 	
 	socket.on("validate", function(data) {	
-
-			//user = new User(socket);
-			//manager.findTable().addUser(user);
-			//users[users.length] = user;
 			
-			//console.log(users[0].getSocket);	
-	});
-
-	socket.on('my other event', function (data) {
-	//console.log(data);
 	});
 });
 
 function User (_socket){
 	
+	this.socket = _socket;
 	
-	var socket = _socket;
-	
-	socket.on("disconnect", function(){
+	var cards = new Array();
 
-	console.log("USER DC");
-	users.pop(this);
+	this.button;
 
+	this.socket.on("disconnect", function(){
+
+		console.log("USER DC");
+		manager.removeUser(this);
+		users.pop(this);
 	});
 
+	this.sendMsg = function(title, data){
+		this.socket.emit(title, data);
+	 };
 
-	this.getSocket = function(){ return socket; }
+	this.revCards = function(_cards){
+
+		cards = _cards;
+		this.sendMsg("cards", "card1:" +  cards[0] + ", card2:" + cards[1]);
+
+	}
+
+
+
+	//this.getSocket = function(){ return socket; };
+
 }
 
 function Manager (){
 
-	this.tables = new Array();
-	var table = new Table;
+	var tables = new Array();
 	
-	Manager.prototype.findTable = function(){
-		return table;
-	}
+	this.tablesCount;
+
+	this.removeUser = function(player){
+		for (var i=0;i < tables.length;i++){
+			if (tables[i].removePlayer(player) == true){
+				
+				tables.pop(tables[i]);
+				return true;
+			}	
+		}
+	};
+
+	this.addUser = function(player){
+		for (var i=0; i < tables.length;i++){
+			
+			if(tables[i].tableAvil == true){
+				tables[i].addPlayer(player);
+				return tables.length;	
+			}			
+		};
+
+		var table = new Table;
+		table.addPlayer(player);		
+		tables.push(table);
+		
+		this.tablesCount = tables.length;		
+
+
+		return tables.length;
+	};
+
+	
 
 }
 
 
 
-function Table (){
+function Table(){
 
-	this.players = new Array();		
+	this.tableAvil;
+	var players = new Array();		
+	
+	var comunCards = new Array();
 
-	Table.prototype.tableAvil = function(){
+	
+	 this.removePlayer = function (User) {
+		
+		for (var i=0;i < players.length;i++){
+			if(players[i].socket.id == User.id){
 
-		if(this.players.length > 1){
-			return false;
+				console.log("Player removed!");
+				players.pop(User);
+
+				
+				broadCast("tableStatus", "You are the Winner!");
+
+				return true;
+
+			}
 		}
-
-		return true;
-	}
 		
-	Table.prototype.addUser = function(User) {
-		this.players[this.players.length] = User;
+		return false;
+	};
+	
 		
-		console.log(this.players.length);
+	this.addPlayer = function(User) {
+		players.push(User);
 
-		if (this.players.length > 1){
+		if (players.length > 1){
+			this.tableAvil = false;
+			broadCast("tableStatus", "Start Table!");
 			console.log("Start Table");
+			dealCards();
 		}
 		else{
-			console.log("Wait for players");
+			this.tableAvil = true;
+			broadCast("tableStatus", "Waiting on more players!");
+			console.log("Waiting on more players");
+			players[0].button = true;
 		}
+	};
+
+	var dealCards = function(){
+
+		deck = new Deck;
+		for (var i=0;i < players.length;i++){
+			players[i].revCards(new Array(deck.getCard(), deck.getCard()));
+
+		}
+
+		comunCards.push(deck.getCard())
+		comunCards.push(deck.getCard())
+		comunCards.push(deck.getCard())
+		comunCards.push(deck.getCard())
+		comunCards.push(deck.getCard())
+
+	};
+
+
+	var moveButton = function(){
+		if (players[0].button == true){
+			players[0].button = false;
+			players[1].button = true;
+		}		
 	}
-						
+
+
+	var broadCast = function(title, data){
 		
+		for (var i=0;i < players.length;i++){		
+			players[i].sendMsg(title, data); 
+		}		
+	};
+
+					
+}
+
+
+function Deck(){
+	
+	var deck = new Array("c1", "c2", "c3", "c4", "c5", "c6", "c7","c8","c9","c10","cj", "cq", "ck",
+			     "d1", "d2", "d3", "d4", "d5", "d6", "d7","d8","d9","d10","dj", "dq", "dk", 
+			     "h1", "h2", "h3", "h4", "h5", "h6", "h7","h8","h9","h10","hj", "hq", "hk", 
+			     "s1", "s2", "s3", "s4", "s5", "s6", "s7","s8","s9","s10","sj", "sq", "sk");
+	 this.getCard  = function(){
+		
+                return deck.splice(Math.floor(Math.random()*deck.length),1);
+        };
+	
+
+
+}
+
+
+function Card(_suit, _value){
+
+	this.suit = _suit;
+	this.value = _value;
+
 }
 

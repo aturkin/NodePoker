@@ -1,0 +1,30 @@
+#table{background-color:green;
+	   width: 600px;
+	   height: 500px;
+	   position: 50%;
+	   margin: auto;
+}
+#player2{background-color: red;
+		width: 200px;
+		height: 100px;
+		position: absolute;
+		margin-left:200px;
+		margin-top:75px;}
+		
+#status{background-color: purple;
+		width: 200px;
+		height: 40px;
+		position: absolute;
+		margin-top: 230px;
+		margin-left:200px;}
+
+#player1{background-color: yellow;
+		 width: 200px;
+		 height: 100px;
+		 position: absolute;
+		 margin-left:200px;
+		 margin-top: 325px;
+		}
+#playerMoves{padding-top: 475px;
+			padding-right:50px;
+			text-align:right;}

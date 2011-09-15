@@ -1,14 +1,12 @@
 <script>
 
-
 $(document).ready(function(){
 
 	$('#submit').click(function(){
 		
-		//var loginObject = {user: $('#user').val, password: $('password').val};
-		
-		socket.emit('validate', {user: $('#user').val(), password: $('#password').val()});
-		console.log($('#user').val());
+		//socket.emit('validate', {user: $('#user').val(), password: $('#password').val()});
+		//console.log($('#user').val());
+		window.location = "/table"
 	});
 });
 

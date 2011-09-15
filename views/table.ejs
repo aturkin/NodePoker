@@ -1,0 +1,46 @@
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/style.css" charset="utf-a" />
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+	$(document).ready(function(){
+
+       		 var socket = io.connect('http://localhost');
+       		
+		 socket.on('tableStatus', function(data){
+                	console.log(data);
+		 });
+
+		socket.on('cards', function(data){
+			console.log(data.card2);		
+
+		});	
+
+	});
+	
+</script>
+
+<div id="title" align="center">
+	<h1>Tables</h1>
+</div>
+
+<div id="Table">
+		
+	<div id="player2"></div>  
+	
+	<div id="status"></div>
+		
+	<div id="player1"></div>		
+	
+	<div id="playerMoves"></div>
+		
+
+</div>
+
+<div id="PlayerControls" align="center">
+		
+</div>
+
